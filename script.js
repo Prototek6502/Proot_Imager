@@ -1,13 +1,13 @@
-let usbDevice;
+let port;
 let writer;
 
 document.getElementById('connect').addEventListener('click', async () => {
     try {
-        usbDevice = await navigator.usb.requestDevice({ filters: [] });
-        await usbDevice.open(); // Open the USB device
-        await usbDevice.selectConfiguration(1); // Select configuration
-        await usbDevice.claimInterface(0); // Claim interface
-        document.getElementById('status').textContent = 'Connected to USB Drive';
+        // Request a serial port
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 }); // Open the port with a specified baud rate
+
+        document.getElementById('status').textContent = 'Connected to USB Device';
         document.getElementById('flash').disabled = false;
     } catch (error) {
         document.getElementById('status').textContent = 'Error: ' + error;
@@ -26,9 +26,12 @@ document.getElementById('flash').addEventListener('click', async () => {
     const dataView = new Uint8Array(arrayBuffer);
 
     try {
-        const result = await usbDevice.transferOut(1, dataView); // Send data to USB
+        writer = port.writable.getWriter(); // Get a writer for the port
+        await writer.write(dataView); // Send data to the USB device
         document.getElementById('status').textContent = 'Flashing process initiated...';
     } catch (error) {
         document.getElementById('status').textContent = 'Error: ' + error;
+    } finally {
+        writer.releaseLock(); // Release the writer lock
     }
 });
