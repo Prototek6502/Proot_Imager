@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "WebUSB Example",
+  "version": "1.0",
+  "description": "A WebUSB example",
+  "permissions": ["usb"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ]
+}

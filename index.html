@@ -1,21 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USB Flasher</title>
-    <link rel="stylesheet" href="styles.css">
+  <title>WebUSB Example</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Upload Manjaro ISO</h1>
-        <form id="uploadForm">
-            <input type="file" id="fileInput" name="file" accept=".iso">
-            <button type="submit">Upload</button>
-        </form>
-        <div id="message"></div>
-        <button id="connectButton">Connect USB Device</button>
-    </div>
-    <script src="script.js"></script>
+  <h1>WebUSB Example</h1>
+  <button id="request-device-button">Request Device</button>
+  <script src="contentScript.js"></script>
 </body>
 </html>
