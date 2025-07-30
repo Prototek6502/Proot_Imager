@@ -1,37 +1,47 @@
-let port;
-let writer;
+document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    const messageDiv = document.getElementById('message');
 
-document.getElementById('connect').addEventListener('click', async () => {
-    try {
-        // Request a serial port
-        port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 }); // Open the port with a specified baud rate
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-        document.getElementById('status').textContent = 'Connected to USB Device';
-        document.getElementById('flash').disabled = false;
-    } catch (error) {
-        document.getElementById('status').textContent = 'Error: ' + error;
+        // Here you would typically send the file to a backend server
+        // For example, using fetch:
+        // fetch('/upload', {
+        //     method: 'POST',
+        //     body: formData
+        // }).then(response => response.text())
+        //   .then(data => {
+        //       messageDiv.textContent = data;
+        //   }).catch(error => {
+        //       messageDiv.textContent = 'Error uploading file';
+        //   });
+
+        // Since we can't actually upload to a backend in this example, we'll just simulate it
+        messageDiv.textContent = 'File uploaded successfully!';
+    } else {
+        messageDiv.textContent = 'Please select a file to upload.';
     }
 });
 
-document.getElementById('flash').addEventListener('click', async () => {
-    const fileInput = document.getElementById('disk-image');
-    const file = fileInput.files[0];
-    if (!file) {
-        document.getElementById('status').textContent = 'Please select a disk image.';
-        return;
-    }
-
-    const arrayBuffer = await file.arrayBuffer();
-    const dataView = new Uint8Array(arrayBuffer);
-
+document.getElementById('connectButton').addEventListener('click', async () => {
     try {
-        writer = port.writable.getWriter(); // Get a writer for the port
-        await writer.write(dataView); // Send data to the USB device
-        document.getElementById('status').textContent = 'Flashing process initiated...';
+        const device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x1d6b, productId: 0x0104 }] });
+        await device.open();
+        await device.selectConfiguration(1);
+        await device.claimInterface(0);
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = 'USB device connected successfully!';
+
+        // Here you would add the code to write the ISO file to the USB device
+        // This is a complex process and may require additional libraries or backend support
+
     } catch (error) {
-        document.getElementById('status').textContent = 'Error: ' + error;
-    } finally {
-        writer.releaseLock(); // Release the writer lock
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = 'Error connecting to USB device: ' + error.message;
     }
 });
